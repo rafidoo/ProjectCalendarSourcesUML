@@ -12,7 +12,22 @@
 }
 */
 
+///On définit l'addition de 2 durées
+Duree Duree::operator+(const Duree& d2)const{
+    Duree dur=*this;
+    dur.setDuree(dur.getDureeEnMinutes()+d2.getDureeEnMinutes());
+    return dur;
+}
+///On définit la division d'une duree par un entier. La duree obtenue doit être multiple de 15.
+Duree Duree::div(unsigned int n) const{
+    Duree dur=*this;
+    unsigned int u=dur.getDureeEnMinutes()/n;
+    if (u%15<8) u=u-u%15;
+    if (u%15>7) u=u+(15-u%15);
+    dur.setDuree(u);
+    return dur;
 
+}
 QTextStream& operator<<(QTextStream& f, const Duree & d){ d.afficher(f); return f; }
 
 QTextStream& operator>>(QTextStream& flot, Duree& duree){
@@ -95,26 +110,36 @@ Tache* TacheExplorer::trouverTache(const QString& id)const{
 }
 
 Tache& TacheExplorer::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
-    if (trouverTache(id)) throw CalendarException("erreur, TacheManager, tache deja existante");
+    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     Tache* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
     addItem(newt);
     return *newt;
 }
 
 Tache& TacheExplorer::ajouterTacheComposite(const QString& id, const QString& t){
-    if (trouverTache(id)) throw CalendarException("erreur, TacheManager, tache deja existante");
+    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     Tache* newt=new TacheComposite(id,t);
     addItem(newt);
     return *newt;
 }
+
+///L'ajout d'une tache unitaire dans une tache composite implique la copie de la référence de cette tache dans le tache manager
 Tache& TacheComposite::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
-    if (trouverTache(id)) throw CalendarException("erreur, TacheManager, tache deja existante");
+    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     Tache* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
     addItem(newt);
+    updateAttributs();
     TacheManager::getInstance().addItem(newt);
     return *newt;
 }
 
+Tache& TacheComposite::ajouterTacheComposite(const QString& id, const QString& t){
+    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
+    Tache* newt=new TacheComposite(id,t);
+    addItem(newt);
+    updateAttributs();
+    return *newt;
+}
 Tache& TacheExplorer::getTache(const QString& id){
     Tache* t=trouverTache(id);
     if (!t) throw CalendarException("erreur, TacheManager, tache inexistante");
@@ -273,77 +298,61 @@ void TacheManager::libererInstance(){
     handler.instance=0;
 }
 
-
-Duree TacheComposite::getDuree() const
+Duree TacheComposite::findDuree()const
 {
-    return 0;
-}
-bool TacheComposite::getAllProgrammed()const
-{
-    return 0;
-}
-QDate TacheComposite::getDispo() const
-{
-    QDate qd (1995,2,1);
-    return qd;
-}
-
-QDate TacheComposite::getDeadline() const
-{
-    QDate qd (2000,2,1);
-    return qd;
-}
-
-/*Duree TacheComposite::getDuree() const
-{
+    Iterator i = getIterator();
     Duree d=0;
-    while(!iterateur->isDone())
+    while(!i.isDone())
     {
-        iterateur->next();
-        d=d+iterateur->iterateur->current().getDuree();
+        d=d+i.current2().getDuree();
+        i.next();
     }
     return d;
 }
-QDate TacheComposite::setDispo(QDate d) const
-{
-    while(!iterateur->isDone())
-    {
-        if(iterateur->current().getDateEcheance()<d)
-        {
-            throw TacheException
-        }
-        iterateur->next();
 
+QDate TacheComposite::findDispo() const{
+    Iterator i=getIterator();
+    QDate d=DATE_MAX;
+    while(!i.isDone()){
+        if(i.current2().getDateEcheance()<d)
+        {
+            d=i.current2().getDateEcheance();
+        }
+        i.next();
     }
     return d;
 }
-QDate TacheComposite::setDeadline(QDate d) const
 
-    while(!iterateur->isDone())
-    {
-        if(iterateur->current().getDateDisponibilite()>d)
+QDate TacheComposite::findEcheance() const{
+    Iterator i=getIterator();
+    QDate d=DATE_MIN;
+    while(!i.isDone()){
+        if(i.current2().getDateEcheance()>d)
         {
-            throw TacheException
+            d=i.current2().getDateEcheance();
         }
-        iterateur->next();
-
+        i.next();
     }
     return d;
-{}
+}
 
-bool TacheComposite::getAllProgrammed()const
-{
+
+bool TacheComposite::findAllProgrammed()const{
     bool d=true;
-    while(!iterateur->isDone())
-    {
-
-        if (iterateur->current().getProgrammee()==false)
+    Iterator i = getIterator();
+    while(!i.isDone()){
+        if (i.current2().getProgrammee()==false)
         {
             d=false;
         }
-        iterateur->next();
+        i.next();
     }
     return d;
 }
 
-*/
+void TacheComposite::updateAttributs(){
+    duree=findDuree();
+    disponibilite=findDispo();
+    echeance=findEcheance();
+    programmee=findAllProgrammed();
+}

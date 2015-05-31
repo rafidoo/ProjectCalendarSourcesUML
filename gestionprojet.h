@@ -34,6 +34,8 @@ public:
     double getDureeEnHeures() const { return double(nb_minutes)/60; } //<!Retourne la duree en heures
     unsigned int getMinute() const { return nb_minutes%60; }
     unsigned int getHeure() const { return nb_minutes/60; }
+    Duree operator+(const Duree& d2)const;
+    Duree div(unsigned int n) const;
     void afficher(QTextStream& f) const; //<!Affiche la duree sous le format hhHmm
 private:
     unsigned int nb_minutes;
@@ -54,6 +56,8 @@ class Visiteur{};*/
 
 class Tache {
 protected:
+    const QDate DATE_MIN = QDate(0,1,1);
+    const QDate DATE_MAX = QDate(9999,1,1);
     QString identificateur;
     QString titre;
     Duree duree;
@@ -73,15 +77,9 @@ public:
     QString getTitre() const { return titre; }
     void setTitre(const QString& str) { titre=str; }
     Duree getDuree() const { return duree; }
-    void setDuree(const Duree& d) { duree=d; }
     QDate getDateDisponibilite() const {return disponibilite; }
     QDate getDateEcheance() const {  return echeance; }
     bool getProgrammee()const{return programmee;}
-    void setDatesDisponibiliteEcheance(const QDate& disp, const QDate& e) {
-        if (e<disp) throw CalendarException("erreur Tache : date echeance < date disponibilite");
-        disponibilite=disp; echeance=e;
-    }
-
 };
 class TacheExplorer {
 protected:
@@ -117,13 +115,13 @@ public:
             nbRemain--;
             currentTache++;
         }
-        Tache& current() const {
+        Tache& current2() const {
             if (isDone())
                 throw CalendarException("error, indirection on an iterator which is done");
             return **currentTache;
         }
     };
-    Iterator getIterator() {
+    Iterator getIterator()const {
         return Iterator(taches,nb);
     }
     class iterator {
@@ -196,16 +194,17 @@ public:
 class TacheComposite:public Tache,public TacheExplorer{
     public:
     TacheComposite (const QString& id, const QString& t):
-        Tache(id,t,getDuree(),getDispo(),getDeadline(),getAllProgrammed()),TacheExplorer(){}
+        Tache(id,t,findDuree(),findDispo(),findEcheance(),findAllProgrammed()),TacheExplorer(){}
     ~TacheComposite();
-
     //void accept(Visiteur* v);
+    Tache& ajouterTacheComposite(const QString& id, const QString& t);
     Tache& ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt);
-    Duree getDuree() const;
-    QDate getDispo() const;
-    QDate getDeadline() const;
+    Duree findDuree() const;
+    QDate findDispo() const;
+    QDate findEcheance() const;
     bool getAllInproject();
-    bool getAllProgrammed()const;
+    bool findAllProgrammed()const;
+    void updateAttributs();
 
 };
 
@@ -225,6 +224,16 @@ public:
     TacheUnitaire (const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline,  bool program=false,bool preemp=false):
         Tache(id,t,dur,dispo,deadline,program),preemptive(preemp){}
     ~TacheUnitaire();
+    void setDuree(const Duree& d) {
+        Duree d2(720);
+        if(!preemptive && d.getDureeEnMinutes()>d2.getDureeEnMinutes()) throw CalendarException("Duree trop elevee (>12h) pour une tache non-preemptive");
+        duree=d;
+    }
+    void setDatesDisponibiliteEcheance(const QDate& disp, const QDate& e) {
+        if (e<disp) throw CalendarException("erreur Tache : date echeance < date disponibilite");
+        if (disp>DATE_MAX || disp<DATE_MIN) throw CalendarException("erreur Tache : disponibilite hors limites de temps");
+        if (e>DATE_MAX || e<DATE_MIN) throw CalendarException("erreur Tache : echeance hors limites de temps");
+        disponibilite=disp; echeance=e;}
     bool isPreemptive() const { return preemptive; }
     void setPreemptive() { preemptive=true; }
     void setNonPreemptive() { preemptive=false; }
