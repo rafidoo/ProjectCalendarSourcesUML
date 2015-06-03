@@ -82,12 +82,19 @@ TacheUnitaire::accept(Visiteur *v)
 TacheComposite::accept(Visiteur *v)
 {
     v->visitObjetDeTypeTacheComposite(this);
-}*/
+}
+
 Tache::~Tache(){}
-TacheComposite::~TacheComposite(){}
+TacheComposite::~TacheComposite(){
+    delete sousTaches;
+    delete tachesPrecedentes;
+}
+
+*/
 TacheUnitaire::~TacheUnitaire(){}
 
-TacheExplorer::TacheExplorer():taches(),nb(0),nbMax(0){}
+
+//TacheExplorer::TacheExplorer():taches(),nb(0),nbMax(0){}
 
 
 void TacheExplorer::addItem(Tache* t){
@@ -109,37 +116,46 @@ Tache* TacheExplorer::trouverTache(const QString& id)const{
     return 0;
 }
 
-Tache& TacheExplorer::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
+void TacheExplorer::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
     if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
-    Tache* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
+    TacheUnitaire* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
     addItem(newt);
-    return *newt;
 }
 
-Tache& TacheExplorer::ajouterTacheComposite(const QString& id, const QString& t){
+void TacheExplorer::ajouterTacheComposite(const QString& id, const QString& t){
     if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
-    Tache* newt=new TacheComposite(id,t);
+    TacheComposite* newt=new TacheComposite(id,t);
     addItem(newt);
-    return *newt;
 }
 
 ///L'ajout d'une tache unitaire dans une tache composite implique la copie de la référence de cette tache dans le tache manager
-Tache& TacheComposite::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
-    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
-    Tache* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
-    addItem(newt);
+void TacheComposite::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
+    if (sousTaches->trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
+    TacheUnitaire* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
+    sousTaches->addItem(newt);
     updateAttributs();
     TacheManager::getInstance().addItem(newt);
-    return *newt;
 }
 
-Tache& TacheComposite::ajouterTacheComposite(const QString& id, const QString& t){
-    if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
-    Tache* newt=new TacheComposite(id,t);
-    addItem(newt);
+void TacheComposite::ajouterTacheComposite(const QString& id, const QString& t){
+    if (sousTaches->trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
+    TacheComposite* newt=new TacheComposite(id,t);
+    sousTaches->addItem(newt);
     updateAttributs();
-    return *newt;
 }
+
+void TacheComposite::ajouterTacheExistante(Tache* t){
+    sousTaches->addItem(t);
+    updateAttributs();
+}
+
+void TacheUnitaire:: ajouterTachePrec(Tache* t){
+    tachesPrecedentes->addItem(t);
+}
+
+
+
+
 Tache& TacheExplorer::getTache(const QString& id){
     Tache* t=trouverTache(id);
     if (!t) throw CalendarException("erreur, TacheManager, tache inexistante");
@@ -150,6 +166,7 @@ Tache& TacheExplorer::getTache(const QString& id){
     return const_cast<TacheManager*>(this)->getTache(id);
 }
 */
+
 TacheExplorer::~TacheExplorer(){
     //if (file!="") save(file);
     for(unsigned int i=0; i<nb; i++) delete taches[i];
@@ -300,7 +317,7 @@ void TacheManager::libererInstance(){
 
 Duree TacheComposite::findDuree()const
 {
-    Iterator i = getIterator();
+    TacheExplorer::Iterator i = sousTaches->getIterator();
     Duree d=0;
     while(!i.isDone())
     {
@@ -311,7 +328,7 @@ Duree TacheComposite::findDuree()const
 }
 
 QDate TacheComposite::findDispo() const{
-    Iterator i=getIterator();
+    TacheExplorer::Iterator i=sousTaches->getIterator();
     QDate d=DATE_MAX;
     while(!i.isDone()){
         if(i.current2().getDateEcheance()<d)
@@ -324,7 +341,7 @@ QDate TacheComposite::findDispo() const{
 }
 
 QDate TacheComposite::findEcheance() const{
-    Iterator i=getIterator();
+    TacheExplorer::Iterator i=sousTaches->getIterator();
     QDate d=DATE_MIN;
     while(!i.isDone()){
         if(i.current2().getDateEcheance()>d)
@@ -339,7 +356,7 @@ QDate TacheComposite::findEcheance() const{
 
 bool TacheComposite::findAllProgrammed()const{
     bool d=true;
-    Iterator i = getIterator();
+    TacheExplorer::Iterator i = sousTaches->getIterator();
     while(!i.isDone()){
         if (i.current2().getProgrammee()==false)
         {
