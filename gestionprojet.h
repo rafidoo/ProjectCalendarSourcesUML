@@ -14,6 +14,10 @@ private:
     QString info;
 };
 
+/**
+ * @brief The Duree class
+ * Classe de définition d'une durée. Une duree peut être construite à partir de sa valeur en minutes ou heures et minutes
+ */
 class Duree{
 public:
     //! Constructeur ? partir de heure et minute
@@ -49,6 +53,7 @@ public:
 };
 
 class Visiteur{};*/
+class TacheExplorer;
 
 class Tache {
 protected:
@@ -66,9 +71,10 @@ protected:
 public:
     Tache(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline,bool program=false):
         identificateur(id),titre(t),duree(dur),disponibilite(dispo),echeance(deadline),programmee(program){}
-    virtual ~Tache(){}
-    //virtual void ajouterTacheCompositePrec(const QString& id, const QString& t)=0;
-    //virtual void ajouterTacheUnitairePrec(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt)=0;
+    virtual ~Tache();
+    TacheExplorer* tachesPrecedentesTraitement;
+    TacheExplorer* tachesPrecedentesAffichage;
+    virtual void ajouterTachePrecedenteA(Tache* u)=0;
     QString getId() const { return identificateur; }
     void setId(const QString& str);
     QString getTitre() const { return titre; }
@@ -77,26 +83,29 @@ public:
     QDate getDateDisponibilite() const {return disponibilite; }
     QDate getDateEcheance() const {  return echeance; }
     bool getProgrammee()const{return programmee;}
+    TacheExplorer* getTachesPrecedentesPourAffichage()const{return tachesPrecedentesAffichage;}
+    TacheExplorer* getTachesPrecedentesPourTraitement()const{return tachesPrecedentesTraitement;}
 };
 
 class TacheExplorer {
 protected:
-    void ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt=false);
-    void ajouterTacheComposite(const QString& id, const QString& t);
     Tache** taches;
     unsigned int nb;
     unsigned int nbMax;
+
+    void ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt=false);
+    void ajouterTacheComposite(const QString& id, const QString& t);
     TacheExplorer& operator=(const TacheExplorer& um);
 public:
-    Tache* trouverTache(const QString& id) const;
     TacheExplorer(){}
     ~TacheExplorer();
     TacheExplorer(const TacheExplorer& um);
+    Tache* trouverTache(const QString& id) const;
     Tache& getTache(const QString& id);
     bool isTacheExistante(const QString& id) const { return trouverTache(id)!=0; }
     //const Tache& getTache(const QString& code) const;
     void addItem(Tache* t);
-
+    void concatSansRedondance(const TacheExplorer* tE);
     class Iterator{
         friend class TacheExplorer;
         Tache** currentTache;
@@ -111,10 +120,10 @@ public:
             nbRemain--;
             currentTache++;
         }
-        Tache& current2() const {
+        Tache* current2() const {
             if (isDone())
                 throw CalendarException("error, indirection on an iterator which is done");
-            return **currentTache;
+            return *currentTache;
         }
     };
     Iterator getIterator()const {
@@ -188,11 +197,14 @@ public:
 };
 
 class TacheComposite:public Tache{
-    public:
+public:
     TacheComposite (const QString& id, const QString& t):
-        Tache(id,t,findDuree(),findDispo(),findEcheance(),findAllProgrammed()),sousTaches(new TacheExplorer()),tachesPrecedentes(new TacheExplorer()){}
+        Tache(id,t,findDuree(),findDispo(),findEcheance(),findAllProgrammed()),sousTaches(new TacheExplorer()){
+        tachesPrecedentesTraitement = new TacheExplorer();
+        tachesPrecedentesAffichage = new TacheExplorer();
+    }
     virtual ~TacheComposite(){}
-    TacheExplorer* tachesPrecedentes;
+    //TacheExplorer* tachesPrecedentes;
     TacheExplorer* sousTaches;
     //void accept(Visiteur* v);
     void ajouterTacheComposite(const QString& id, const QString& t);
@@ -200,9 +212,11 @@ class TacheComposite:public Tache{
     Duree findDuree() const;
     QDate findDispo() const;
     QDate findEcheance() const;
-    bool getAllInproject();
+    bool getAllInproject()const;
     bool findAllProgrammed()const;
+    void updateTachesPrecedentes();
     void updateAttributs();
+    void ajouterTachePrecedenteA(Tache* u);
     void ajouterTacheExistante(Tache* t);
 
 };
@@ -218,13 +232,14 @@ public:
 class TacheUnitaire:public Tache{
     bool preemptive;
     bool inTree;
-    void ajouterTachePrec (Tache* t);
 public:
     //void accept(Visiteur* v);
     TacheUnitaire (const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool program=false,bool preemp=false):
-        Tache(id,t,dur,dispo,deadline,program),preemptive(preemp){}
+        Tache(id,t,dur,dispo,deadline,program),preemptive(preemp){
+        tachesPrecedentesAffichage = new TacheExplorer();
+        tachesPrecedentesTraitement = new TacheExplorer();
+    }
     virtual ~TacheUnitaire();
-    TacheExplorer* tachesPrecedentes;
     void setDuree(const Duree& d) {
         Duree d2(720);
         if(!preemptive && d.getDureeEnMinutes()>d2.getDureeEnMinutes()) throw CalendarException("Duree trop elevee (>12h) pour une tache non-preemptive");
@@ -235,6 +250,8 @@ public:
         if (disp>DATE_MAX || disp<DATE_MIN) throw CalendarException("erreur Tache : disponibilite hors limites de temps");
         if (e>DATE_MAX || e<DATE_MIN) throw CalendarException("erreur Tache : echeance hors limites de temps");
         disponibilite=disp; echeance=e;}
+    void ajouterTachePrecedenteA(Tache* u);
+    void ajouterTachePrecedente(Tache* tP);
     bool isPreemptive() const { return preemptive; }
     void setPreemptive() { preemptive=true; }
     void setNonPreemptive() { preemptive=false; }
@@ -250,7 +267,6 @@ public:
 }*/
 
 /*class FacadeGP {
-fonction d'ajout de deux tableaux de tache
 suppression de taches.
 /*
  * S'occuper de la sauvegarde!!!
