@@ -184,11 +184,7 @@ namespace TIME{
 
 	class EvtManagerTache: public EvtManager {	// Attribut : une tache à mettre ou pas ?
 	  public:
-		void addEvt(Tache * T)			// Je dois mettre en paramtre une tache ou un Evt ?
-		{
-			if (nb == nbMax)
-			// A continuer ...
-		}
+		void addEvt(Tache * T);			// Je dois mettre en parametre une tache ou un Evt ?
 	};
 
 	class EvtManagerRDV: public EvtManager {	// Attribut : un RDV à mettre ou pas ?
