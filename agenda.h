@@ -7,113 +7,78 @@
 #include <sstream>
 #include "timing.h"
 
+using namespace std;
+
 namespace TIME{
+
+	class EvtManager {
+	  protected:
+		Evt ** evt;
+		unsigned int nb;
+		unsigned int nbMax;
+		QString file;
+		EvtManager & operator =(const EvtManager & um);
+	  public:
+		EvtManager() {}
+		~ EvtManager() {}
+		//Evt ** getEvt() { return evt; }			// Utile ?
+		virtual void addEvt(Evt * e, QDate & date, QTime & h);
+		virtual Evt & addNewEvt();
+		Evt * trouverEvt(QSring & s);
+		void load(QString & f);
+		void save(QString & f);
+	};
 
     	class Evt {
 	  protected :
-		Date date;
-		std::string sujet;
+		DDate date;
+		QString sujet;
       	  public:
-		Evt(const Date& d, const std::string& s): date(d), sujet(s) {}
+		Evt(const QDate & d, const QString & s): date(d), sujet(s) {}
 		virtual ~Evt() {}
-		const std::string getDescripteur() { return sujet; }
+		const QString getDescripteur() { return sujet; }
+		const QDate & getDate() { return date; }
 		virtual void afficher(std::ostream &) const
 		{
-		    std::stringstream f;
-		    f<<toString();
+		    	std::stringstream f;
+		    	f<<toString();
 		}
-		virtual std::string toString() const
+		virtual QString toString() const
 		{
-		    std::stringstream f;
-		    f<<"***** Evt ********"<<"\n"<<" sujet = "<<sujet<<"\n\n";
-		    return f.str();
+		    	std::stringstream f;
+		    	f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n\n";
+		    	return f.str();
 		}
-		virtual Evt * clone() const=0;
-		const Date & getDate() { return date; }
-		virtual bool operator <(Evt & e)
+		virtual Evt * clone() const = 0;
+		//Evt * clone() const { return new Evt1j(*this); }	/// Cette ligne était dans Evt1j, laquelle guarder ?
+		
+		/*virtual bool operator <(Evt & e)			/// Fonction devenue inutile puisqu'on peut utiliser l'operateur < de QDate
 		{
-		    return date < e.date;
-		}
-    	};
-
-    	class Agenda{
-		typedef std::vector<Evt*> contEvt;
-		contEvt evts;
-		Agenda(const Agenda &);
-		Agenda & operator =(const Agenda &);
-      	  public:
-		Agenda() { evts.reserve(10); }
-		Agenda & operator <<(const Evt & e)
-		{
-		        Evt * nevt = e.clone();
-		        // nevt pointe sur une copie créée dynamiquement de
-		        // l'objet e transmis en parametre
-		        evts.push_back(nevt);
-		        return *this;
-		}
-		virtual ~Agenda()
-		{
-		        for (contEvt::iterator it=evts.begin(); it!=evts.end(); ++it)
-		        // On pourrait faire une boucle sur un tableau avec un i
-		        // qui va jusqu'a la taille du vecteur et puis delete evts[i]
-		            delete *it;
-		}
-        	virtual void afficher(std::ostream& f=std ::cout)const
-           	{
-		        for (contEvt::const_iterator it=evts.begin(); it!=evts.end(); ++it)
-		            (*it)->afficher(f);
-            	}
-
-        	class iterator{
-            		contEvt::iterator it;
-          	  public:
-			iterator(contEvt::iterator i): it(i) {}
-			Evt& operator *() const { return **it; }
-			iterator & operator ++() { ++it; return *this; }
-			iterator & operator --() { --it; return *this; }
-			bool operator !=(iterator i) const { return i.it!=it; }
-		};
-		iterator begin()  { return iterator(evts.begin()); }
-		iterator end() { return iterator(evts.end()); }
-    	};
-
-    	class Evt1j : public Evt {
-      	  public:
-		Evt1j(const Date& d, const std::string& s): Evt(d,s) {}
-		virtual ~Evt1j() {}
-		/*virtual void afficher(std::ostream& f= std::cout) const{
-		    f<<"***** Evt ********"<<"\n"<<"Date = "<<date<<" sujet = "<<sujet<<"\n\n";
+		    	return date < e.date;
 		}*/
-		Evt1j * clone() const { return new Evt1j(*this); }
-		std::string toString() const
-		{
-		    std::stringstream f;
-		    f<<"***** Evt ********"<<"\n"<<"Date = "<<date<<" sujet = "<<sujet<<"\n\n";
-		    return f.str();
-		}
     	};
 
-    	class Evt1jDur: public Evt1j{
-		Horaire debut;
+    	class Evt1jDur: public Evt{
+		QTime debut;
 		Duree duree;
       	  public:
-		Evt1jDur(const Date& d, const std::string& s, const Horaire& deb, const Duree& dur):
-		        Evt1j(d, s) ,debut(deb), duree(dur) {}
+		Evt1jDur(const QDate & d, const QString & s, const QTime& deb, const Duree & dur):
+		        Evt(d, s) ,debut(deb), duree(dur) {}
 		~Evt1jDur() {}
-		const Horaire& getDebut() const { return this->debut; }
-		const Duree& getDuree() const { return this->duree; }
+		const QTime & getDebut() const { return this->debut; }
+		const Duree & getDuree() const { return this->duree; }
 		/*virtual void afficher(std::ostream& f = std::cout) const{
-		    Evt1j::afficher(f);
-		    this->debut.afficher(f);
-		    this->duree.afficher(f);
+		    	Evt1j::afficher(f);
+		    	this->debut.afficher(f);
+		    	this->duree.afficher(f);
 		}*/
-		std::string toString() const
+		QString toString() const
 		{
-		    std::stringstream f;
-		    f<<"***** Evt ********"<<"\n"<<"Debut = "<<debut<<"Duree = "<<duree<<" sujet = "<<sujet<<"\n\n";
-		    return f.str();
+		    	std::stringstream f;
+			f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n"<<"Debut = "<<debut<<"\n"<<"Duree = "<<duree<<"\n\n";		    
+		    	return f.str();
 		}
-		Evt1jDur * clone() const { return new Evt1jDur(*this); }
+		Evt1jDur * clone() const { return new Evt1jDur(*this); }		/// A mettre ?
 		bool operator <(Evt & e) {  						//Redefinition
 		    if(Evt::operator <(e)) return true; 				//true si actuelle anterieure à e
 		    if(e<*this) return false;           				//false si e anterieure a classe actuelle
@@ -126,72 +91,41 @@ namespace TIME{
 		}
     	};
 
-    	class RDV: public Evt1jDur{
-		std::string lieu;
-		std::string personne;
+    	class EvtRDV: public Evt1jDur{
+		QString lieu;
+		QString personne;
 	      public:
-		RDV(const Date& d, const std::string& s, const Horaire& deb, const Duree& dur, const std::string& l, const std::string& pers):
+		EvtRDV(const QDate & d, const QString & s, const Qtime & deb, const Duree & dur, const QString & l, const QString & pers):
 		        Evt1jDur(d, s, deb, dur), lieu(l), personne(pers) {}
-		~RDV() {}
+		~EvtRDV() {}
 		/*RDV(const RDV& r): Evt1jDur(r.getDate(), r.getDescription(), r.getDebut(), r.getDuree()),
 		        lieu(r.getLieu()), personne(r.getPersonne())
 		        {} */
-		RDV& operator =(const RDV& r)
+		EvtRDV & operator =(const EvtRDV & r)
 		{
-		    this->lieu = r.lieu;
-		    this->personne = r.personne;
+		    	this->lieu = r.lieu;
+		    	this->personne = r.personne;
 
-		    Evt1j *x = this;
-		    *x = r;
+		    	Evt1j *x = this;
+		    	*x = r;
 		}
-		const std::string& getLieu() const { return this->lieu; }
-		const std::string& getPersonne() const { return this->personne; }
+		const QString & getLieu() const { return this->lieu; }
+		const QString & getPersonne() const { return this->personne; }
 		/*virtual void afficher(std::ostream& f = std::cout) const{
-		    Evt1jDur::afficher(f);
-		    f<<"Lieu = "<<lieu<<std::endl;
-		    f<<"Personne = "<<personne<<std::endl;
+		   	 Evt1jDur::afficher(f);
+		   	 f<<"Lieu = "<<lieu<<std::endl;
+		   	 f<<"Personne = "<<personne<<std::endl;
 		}*/
-        	std::string toString() const
+        	QString toString() const
 		{
-		    std::stringstream f;
-		    f<<"***** Evt ********"<<"\n"<<"Lieu = "<<lieu<<"Personne = "<<personne<<" sujet = "<<sujet<<"\n\n";
-		    return f.str();
+		   	 std::stringstream f;
+			f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n"<<"Debut = "<<debut<<"\n"<<"Duree = "<<duree<<"\n"<<"Lieu = 					"<<lieu<<"Personne = "<<personne<<"\n\n";
+		 	   return f.str();
 		}
-		RDV * clone() const { return new RDV(*this); }
-		void afficher(std::ostream & f = std::cout) const {
-		    Evt1jDur::afficher(f);
-		    f<<personne<<std::endl;
-		    f<<lieu<<std::endl;
-        	}
+		EvtRDV * clone() const { return new RDV(*this); }		/// A mettre ?
     	};
 
-    	std::ostream& operator <<(std::ostream& f, TIME::Evt1j& j);
-
-
-	class EvtManager {
-	  protected:
-		Evt ** evt;
-		unsigned int nb;
-		unsigned int nbMax;
-		QString file;
-	  public:
-		virtual void addEvt(Evt * e);
-		virtual Evt & addNewEvt();
-		Evt * trouverEvt(QSring & s);
-		void load(QString & f);
-		void save(QString & f);
-	};
-
-	class EvtManagerTache: public EvtManager {	// Attribut : une tache à mettre ou pas ?
-	  public:
-		void addEvt(Tache * T);			// Je dois mettre en parametre une tache ou un Evt ?
-	};
-
-	class EvtManagerRDV: public EvtManager {	// Attribut : un RDV à mettre ou pas ?
-	  public:
-		void addEvt(Evt * e);
-		Evt & addNewEvt();
-	};
+    	std::ostream & operator <<(std::ostream& f, TIME::Evt1j& j);		///A quoi ca sert ca ?
 
 	class EvtTache: public Evt1jDur {
 	  public:

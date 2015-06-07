@@ -19,17 +19,21 @@ void EvtManagerTache::addEvt(Tache * T) {
 	}
 	for (unsigned int i = 0; i<nb; i++)
 	{
-		if (evt[i].getDate() == e.getDate())						//Verifier que l'operateur est bien défini
-		{
+		if (evt[i].getDate() == T.getDate())						//Verifier que l'operateur est bien défini
+		{										// Une tache n'a pas de getDate() ?!!
 			unsigned int fin = evt[i].getHoraire() + evt[i].getDuree;		//Verifier que l'operateur est bien défini
-			if(evt[i].getHoraire() < e.getHoraire() && e.getHoraire() < fin)	//Verifier que l'operateur est bien défini et le && ?
+			if(evt[i].getHoraire() < T.getHoraire() && T.getHoraire() < fin)	//Verifier que l'operateur est bien défini et le && ?
 			{
 				cout<<"Erreur, evenement déjà programmé à cette heure ce jour la"<<endl;
 			}
+		}
+	}
+	
+		
 			
 
 
 
-		}
+
 }
 
