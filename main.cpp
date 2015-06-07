@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    //QApplication a(argc, argv);
 
     Duree d1=Duree(180);
     QDate date1= QDate(1925,7,3);
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     TacheManager::getInstance().trouverTache("11")->ajouterTacheUnitaire("111","Assembler la charpente",d1,date1,date2,false);
     TacheManager::getInstance().trouverTache("11")->ajouterTacheUnitaire("112","Assembler la charpente",d1,date1,date2,false);
     VisiteurSauvegarde* vS = new VisiteurSauvegarde ("Test1");
-    std::cout<<"Sauvegarde commence";
+    //std::cout<<"Sauvegarde commence";
     vS->visiterProjet(p);
-    return a.exec();
+    //return a.exec();
 }
