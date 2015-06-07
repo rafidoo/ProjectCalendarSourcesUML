@@ -23,7 +23,7 @@ namespace TIME{
 		~ EvtManager() {}
 		//Evt ** getEvt() { return evt; }			// Utile ?
 		virtual void addEvt(Evt * e, QDate & date, QTime & h);
-		virtual Evt & addNewEvt();
+		virtual Evt & addNewEvt(QDate & d, QString & s, QTime & deb, Duree & dur, QString & l, QString & pers);
 		Evt * trouverEvt(QSring & s);
 		void load(QString & f);
 		void save(QString & f);
@@ -49,9 +49,6 @@ namespace TIME{
 		    	f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n\n";
 		    	return f.str();
 		}
-		virtual Evt * clone() const = 0;
-		//Evt * clone() const { return new Evt1j(*this); }	/// Cette ligne était dans Evt1j, laquelle guarder ?
-		
 		/*virtual bool operator <(Evt & e)			/// Fonction devenue inutile puisqu'on peut utiliser l'operateur < de QDate
 		{
 		    	return date < e.date;
@@ -78,7 +75,6 @@ namespace TIME{
 			f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n"<<"Debut = "<<debut<<"\n"<<"Duree = "<<duree<<"\n\n";		    
 		    	return f.str();
 		}
-		Evt1jDur * clone() const { return new Evt1jDur(*this); }		/// A mettre ?
 		bool operator <(Evt & e) {  						//Redefinition
 		    if(Evt::operator <(e)) return true; 				//true si actuelle anterieure à e
 		    if(e<*this) return false;           				//false si e anterieure a classe actuelle
@@ -122,13 +118,13 @@ namespace TIME{
 			f<<"******** Evenement ********"<<"\n\n"<<"Date = "<<date<<"\n"<<" Sujet = "<<sujet<<"\n"<<"Debut = "<<debut<<"\n"<<"Duree = "<<duree<<"\n"<<"Lieu = 					"<<lieu<<"Personne = "<<personne<<"\n\n";
 		 	   return f.str();
 		}
-		EvtRDV * clone() const { return new RDV(*this); }		/// A mettre ?
     	};
 
     	std::ostream & operator <<(std::ostream& f, TIME::Evt1j& j);		///A quoi ca sert ca ?
 
 	class EvtTache: public Evt1jDur {
 	  public:
+		EvtTache (Tache * T) {}				// Faire un appel au constructeur d'une tache ?
 		void afficher(std::ostream & f = std::cout);
 	};
 }
