@@ -1,7 +1,5 @@
 #include "gestionprojet.h"
-#include <QFile>
 #include <QTextCodec>
-#include <QtXml>
 //#include <QMessageBox>
 
 
@@ -68,25 +66,58 @@ QTextStream& operator<<(QTextStream& fout, const Tache& t){
     return fout;
 }
 
-/*Visiteur::visiterObjetDeTypeTacheUnitaire (TacheUnitaire* tU)
-{}
+VisiteurTache::VisiteurTache(){}
+VisiteurTache::~VisiteurTache(){}
 
-Visiteur::visiterObjetDeTypeTacheComposite (TacheComposite* tC)
-{}
-
-TacheUnitaire::accept(Visiteur *v)
-{
-    v->visitObjetDeTypeTacheUnitaire(this);
+void VisiteurSauvegarde::visiterProjet(Projet* p){
+    std::cout<<"Sauvegarde commence";
+    stream->setAutoFormatting(true);
+    stream->writeStartDocument();
+    stream->writeStartElement("Projet");
+    TacheExplorer::Iterator it = p->sousTaches->getIterator();
+    while(!it.isDone()){
+        it.current2()->accept(this);
+        it.next();
+    }
+    stream->writeEndElement();
+    stream->writeEndDocument();
+    newfile.close();
 }
 
-TacheComposite::accept(Visiteur *v)
+void VisiteurSauvegarde::visiterTacheUnitaire (TacheUnitaire* tU)
 {
-    v->visitObjetDeTypeTacheComposite(this);
+    stream->writeStartElement("tache unitaire");
+    //stream->writeAttribute("preemptive", (taches[i.current2()]->isPreemptive())?"true":"false");
+    stream->writeTextElement("identificateur",tU->getId());
+    stream->writeTextElement("titre",tU->getTitre());
+    stream->writeTextElement("disponibilite",tU->getDateDisponibilite().toString(Qt::ISODate));
+    stream->writeTextElement("echeance",tU->getDateEcheance().toString(Qt::ISODate));
+    QString str;
+    str.setNum(tU->getDuree().getDureeEnMinutes());
+    stream->writeTextElement("duree",str);
+    stream->writeEndElement();
+
 }
 
-*/
-Tache::~Tache(){}
+void VisiteurSauvegarde::visiterTacheComposite (TacheComposite* tC)
+{
+    stream->writeStartElement("tache composite");
+    stream->writeTextElement("identificateur",tC->getId());
+    stream->writeTextElement("titre",tC->getTitre());
+    TacheExplorer::Iterator it = tC->sousTaches->getIterator();
+    while(!it.isDone()){
+        it.current2()->accept(this);
+        it.next();
+    }
+    stream->writeEndElement();
+}
+
+Tache::~Tache(){
+}
 TacheUnitaire::~TacheUnitaire(){}
+TacheComposite::~TacheComposite(){
+    delete sousTaches;
+}
 /**
  * @brief TacheExplorer::concatSansRedondance
  * @param tE
@@ -128,12 +159,18 @@ void TacheExplorer::ajouterTacheUnitaire(const QString& id, const QString& t, co
     addItem(newt);
 }
 
+/*
 void TacheExplorer::ajouterTacheComposite(const QString& id, const QString& t){
     if (trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     TacheComposite* newt=new TacheComposite(id,t);
     addItem(newt);
 }
+*/
 
+void TacheExplorer::supprimerTache(const QString& id){
+    Tache* t=&getTache(id);
+    delete t;
+}
 Tache& TacheExplorer::getTache(const QString& id){
     Tache* t=trouverTache(id);
     if (!t) throw CalendarException("erreur, TacheManager, tache inexistante");
