@@ -332,7 +332,7 @@ void TacheManager::libererInstance(){
 
 ///L'ajout d'une tache unitaire dans une tache composite implique la copie de la référence de cette tache dans le tache manager
 void TacheComposite::ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
-    if (sousTaches->trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
+    if (sousTaches->isTacheExistante(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     TacheUnitaire* newt=new TacheUnitaire(id,t,dur,dispo,deadline,preempt);
     sousTaches->addItem(newt);
     updateAttributs();
@@ -340,7 +340,7 @@ void TacheComposite::ajouterTacheUnitaire(const QString& id, const QString& t, c
 }
 
 void TacheComposite::ajouterTacheComposite(const QString& id, const QString& t){
-    if (sousTaches->trouverTache(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
+    if (sousTaches->isTacheExistante(id)) throw CalendarException("erreur, TacheExplorer, tache deja existante");
     TacheComposite* newt=new TacheComposite(id,t);
     sousTaches->addItem(newt);
     updateAttributs();
@@ -422,11 +422,11 @@ void TacheUnitaire::ajouterTachePrecedente(Tache* tP){
 
 
 void TacheComposite::ajouterTachePrecedenteA(Tache* u){
-        u->tachesPrecedentesTraitement->addItem(this);
+        u->getTachesPrecedentesPourTraitement()->addItem(this);
     }
 
 void TacheUnitaire::ajouterTachePrecedenteA(Tache* u){
-        u->tachesPrecedentesTraitement->concatSansRedondance(this->tachesPrecedentesTraitement);
+        u->getTachesPrecedentesPourTraitement()->concatSansRedondance(this->tachesPrecedentesTraitement);
     }
 
 void TacheComposite::updateTachesPrecedentes(){
