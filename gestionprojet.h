@@ -236,7 +236,6 @@ public:
     Duree findDuree() const;
     QDate findDispo() const;
     QDate findEcheance() const;
-    bool getAllInproject()const;
     bool findAllProgrammed()const;
     void updateTachesPrecedentes();
     void updateAttributs();
