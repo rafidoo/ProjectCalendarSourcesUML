@@ -22,9 +22,9 @@ namespace TIME{
 		EvtManager() {}
 		~ EvtManager() {}
 		//Evt ** getEvt() { return evt; }			// Utile ?
-		virtual void addEvt(Evt * e, QDate & date, QTime & h);
-		virtual Evt & addNewEvt(QDate & d, QString & s, QTime & deb, Duree & dur, QString & l, QString & pers);
-		Evt * trouverEvt(QSring & s);
+		virtual void addEvt(const Evt * e, const QDate & date, const QTime & h);
+		virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, const Duree & dur, const QString & l, const QString & pers);
+		Evt * trouverEvt(const QSring & s);
 		void load(QString & f);
 		void save(QString & f);
 	};
@@ -36,9 +36,9 @@ namespace TIME{
       	  public:
 		Evt(const QDate & d, const QString & s): date(d), sujet(s) {}
 		virtual ~Evt() {}
-		const QString getDescripteur() { return sujet; }
+		const QString & getDescripteur() { return sujet; }
 		const QDate & getDate() { return date; }
-		virtual void afficher(std::ostream &) const
+		virtual void afficher(std::ostream & f) const
 		{
 		    	std::stringstream f;
 		    	f<<toString();
@@ -56,6 +56,7 @@ namespace TIME{
     	};
 
     	class Evt1jDur: public Evt{
+	  protected:
 		QTime debut;
 		Duree duree;
       	  public:

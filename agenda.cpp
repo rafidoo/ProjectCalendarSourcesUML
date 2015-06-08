@@ -9,7 +9,7 @@ std::ostream& operator <<(std::ostream& f, TIME::Evt1j& j){
 }
 /// ********** Fonction pour ajouter une tache déjà existante ********** ///
 
-void EvtManager::addEvt(Evt * e, QDate & date, QTime & h) {			/// Je peux mettre que c'est un EvtTache en parametre ?
+void EvtManager::addEvt(const Evt * e, const QDate & date, const QTime & h) {			/// Je peux mettre que c'est un EvtTache en parametre ?
 	//evt -> tableau de tous les evt existants (taches et RDV)
 	//evt[] pointe sur un evenement particulier et evt[][] est l'evenement en lui meme
 	//evt[].getTruc pour les données
@@ -57,6 +57,6 @@ void EvtManager::addEvt(Evt * e, QDate & date, QTime & h) {			/// Je peux mettre
 
 /// ********** Fonction pour créer puis ajouter une tache ou un RDV ********** ///
 
-virtual Evt & addNewEvt(QDate & d, QString & s, QTime & deb, Duree & dur, QString & l, QString & pers){
+virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, const Duree & dur, const QString & l, const QString & pers){
 
 }
