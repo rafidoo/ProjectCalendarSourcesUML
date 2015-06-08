@@ -20,9 +20,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     gestionprojet.cpp \
     calendrier.cpp \
-    interface.cpp
+    interface.cpp \
+    mainwindow.cpp
 
 HEADERS += \
     gestionprojet.h \
     calendrier.h \
-    interface.h
+    interface.h \
+    mainwindow.h
+
+FORMS += \
+    mainwindow.ui
