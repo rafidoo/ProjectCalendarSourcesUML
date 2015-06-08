@@ -132,10 +132,10 @@ public:
     void supprimerTache(const QString& id);
     void concatSansRedondance(const TacheExplorer* tE);
     class Iterator{
-        friend class TacheExplorer;
         Tache** currentTache;
         unsigned int nbRemain;
         Iterator(Tache** u, unsigned int nb):currentTache(u),nbRemain(nb){}
+        friend class TacheExplorer;
     public:
         Iterator():nbRemain(0),currentTache(0){}
         bool isDone() const { return nbRemain==0; }
@@ -151,8 +151,9 @@ public:
             return *currentTache;
         }
     };
-    Iterator getIterator()const {
-        return Iterator(taches,nb);
+    Iterator* getIterator()const {
+        Iterator* i = new Iterator(taches,nb);
+        return i;
     }
     class iterator {
         Tache** current;
@@ -276,10 +277,10 @@ public:
         disponibilite=disp; echeance=e;}
     void ajouterTachePrecedenteA(Tache* u);
     void ajouterTachePrecedente(Tache* tP);
-    void ajouterTacheComposite(const QString& id, const QString& t){
+    virtual void ajouterTacheComposite(const QString& id, const QString& t){
         throw CalendarException("erreur Tache : impossible d'ajouter une tache à une tache unitaire");
     }
-    void ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
+    virtual void ajouterTacheUnitaire(const QString& id, const QString& t, const Duree& dur, const QDate& dispo, const QDate& deadline, bool preempt){
         throw CalendarException("erreur Tache : impossible d'ajouter une tache à une tache unitaire");
     }
     bool isPreemptive() const { return preemptive; }
@@ -297,10 +298,7 @@ public:
 }*/
 
 /*class FacadeGP {
-suppression de taches.
-/*
- * S'occuper de la sauvegarde!!!
- *
+
 }*/
 #endif // GESTIONPROJET
 

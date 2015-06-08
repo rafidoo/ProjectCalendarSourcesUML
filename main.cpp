@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[])
 {
-    //QApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     Duree d1=Duree(180);
     QDate date1= QDate(1925,7,3);
@@ -24,5 +24,5 @@ int main(int argc, char *argv[])
     VisiteurSauvegarde* vS = new VisiteurSauvegarde ("Test1");
     //std::cout<<"Sauvegarde commence";
     vS->visiterProjet(p);
-    //return a.exec();
+    return a.exec();
 }

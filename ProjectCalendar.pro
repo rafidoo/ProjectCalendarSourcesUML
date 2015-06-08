@@ -12,6 +12,7 @@ QT       +=widgets
 TARGET = ProjectCalendar
 CONFIG   += console
 CONFIG   -= app_bundle
+QMAKE_CXXFLAGS_WARN_ON += -Wno-reorder
 
 TEMPLATE = app
 

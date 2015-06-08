@@ -74,10 +74,10 @@ void VisiteurSauvegarde::visiterProjet(Projet* p){
     stream->setAutoFormatting(true);
     stream->writeStartDocument();
     stream->writeStartElement("Projet");
-    TacheExplorer::Iterator it = p->sousTaches->getIterator();
-    while(!it.isDone()){
-        it.current2()->accept(this);
-        it.next();
+    TacheExplorer::Iterator* it = p->sousTaches->getIterator();
+    while(!it->isDone()){
+        it->current2()->accept(this);
+        it->next();
     }
     stream->writeEndElement();
     stream->writeEndDocument();
@@ -104,10 +104,10 @@ void VisiteurSauvegarde::visiterTacheComposite (TacheComposite* tC)
     stream->writeStartElement("tache composite");
     stream->writeTextElement("identificateur",tC->getId());
     stream->writeTextElement("titre",tC->getTitre());
-    TacheExplorer::Iterator it = tC->sousTaches->getIterator();
-    while(!it.isDone()){
-        it.current2()->accept(this);
-        it.next();
+    TacheExplorer::Iterator* it = tC->sousTaches->getIterator();
+    while(!it->isDone()){
+        it->current2()->accept(this);
+        it->next();
     }
     stream->writeEndElement();
 }
@@ -125,13 +125,13 @@ TacheComposite::~TacheComposite(){
  * On n'autorise pas ici l'ajout d'une tache deja existante dans le TacheExplorer.
  */
 void TacheExplorer::concatSansRedondance(const TacheExplorer* tE){
-    Iterator it = tE->getIterator();
-    while(!it.isDone()){
-        if (!isTacheExistante(it.current2()->getId())){
-            addItem(it.current2());
+    Iterator* it = tE->getIterator();
+    while(!it->isDone()){
+        if (!isTacheExistante(it->current2()->getId())){
+            addItem(it->current2());
         }
     }
-    it.next();
+    it->next();
 }
 
 void TacheExplorer::addItem(Tache* t){
@@ -355,38 +355,38 @@ void TacheComposite::ajouterTacheExistante(Tache* t){
 
 Duree TacheComposite::findDuree()const
 {
-    TacheExplorer::Iterator i = sousTaches->getIterator();
+    TacheExplorer::Iterator* i = sousTaches->getIterator();
     Duree d=0;
-    while(!i.isDone())
+    while(!i->isDone())
     {
-        d=d+i.current2()->getDuree();
-        i.next();
+        d=d+i->current2()->getDuree();
+        i->next();
     }
     return d;
 }
 
 QDate TacheComposite::findDispo() const{
-    TacheExplorer::Iterator i=sousTaches->getIterator();
+    TacheExplorer::Iterator* i=sousTaches->getIterator();
     QDate d=DATE_MAX;
-    while(!i.isDone()){
-        if(i.current2()->getDateEcheance()<d)
+    while(!i->isDone()){
+        if(i->current2()->getDateEcheance()<d)
         {
-            d=i.current2()->getDateEcheance();
+            d=i->current2()->getDateEcheance();
         }
-        i.next();
+        i->next();
     }
     return d;
 }
 
 QDate TacheComposite::findEcheance() const{
-    TacheExplorer::Iterator i=sousTaches->getIterator();
+    TacheExplorer::Iterator* i=sousTaches->getIterator();
     QDate d=DATE_MIN;
-    while(!i.isDone()){
-        if(i.current2()->getDateEcheance()>d)
+    while(!i->isDone()){
+        if(i->current2()->getDateEcheance()>d)
         {
-            d=i.current2()->getDateEcheance();
+            d=i->current2()->getDateEcheance();
         }
-        i.next();
+        i->next();
     }
     return d;
 }
@@ -394,13 +394,13 @@ QDate TacheComposite::findEcheance() const{
 
 bool TacheComposite::findAllProgrammed()const{
     bool d=true;
-    TacheExplorer::Iterator i = sousTaches->getIterator();
-    while(!i.isDone()){
-        if (i.current2()->getProgrammee()==false)
+    TacheExplorer::Iterator* i = sousTaches->getIterator();
+    while(!i->isDone()){
+        if (i->current2()->getProgrammee()==false)
         {
             d=false;
         }
-        i.next();
+        i->next();
     }
     return d;
 }
@@ -430,10 +430,10 @@ void TacheUnitaire::ajouterTachePrecedenteA(Tache* u){
     }
 
 void TacheComposite::updateTachesPrecedentes(){
-    TacheExplorer::Iterator i = sousTaches->getIterator();
-    while(!i.isDone()){
-        i.current2()->ajouterTachePrecedenteA(this);
-        tachesPrecedentesAffichage->addItem(i.current2());
-        i.next();
+    TacheExplorer::Iterator* i = sousTaches->getIterator();
+    while(!i->isDone()){
+        i->current2()->ajouterTachePrecedenteA(this);
+        tachesPrecedentesAffichage->addItem(i->current2());
+        i->next();
     }
 }
