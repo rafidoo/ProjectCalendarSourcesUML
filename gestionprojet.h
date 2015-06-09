@@ -73,7 +73,7 @@ public :
     QXmlStreamWriter* stream;
     void visiterTacheUnitaire (TacheUnitaire* tU);
     void visiterTacheComposite (TacheComposite* tC);
-    void visiterProjet(Projet* p);
+    void visiterProjet(Projet *p);
 };
 
 class TacheExplorer;
@@ -151,8 +151,8 @@ public:
             return *currentTache;
         }
     };
-    Iterator* getIterator()const {
-        Iterator* i = new Iterator(taches,nb);
+    Iterator getIterator()const {
+        TacheExplorer::Iterator i(taches,nb);
         return i;
     }
     class iterator {

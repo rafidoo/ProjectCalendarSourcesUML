@@ -21,13 +21,22 @@ SOURCES += main.cpp \
     gestionprojet.cpp \
     calendrier.cpp \
     interface.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    fenajoutereve.cpp \
+    fenajoutertacheuni.cpp \
+    fentachesprecedentes.cpp
 
 HEADERS += \
     gestionprojet.h \
     calendrier.h \
     interface.h \
-    mainwindow.h
+    mainwindow.h \
+    fenajoutereve.h \
+    fenajoutertacheuni.h \
+    fentachesprecedentes.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    fenajoutereve.ui \
+    fenajoutertacheuni.ui \
+    fentachesprecedentes.ui
