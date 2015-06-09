@@ -97,7 +97,7 @@ using namespace std;
         Evt ** getEvt() { return evt; }
         virtual void addEvt(const Evt * e, const QDate & date, const QTime & h);
         virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, const Duree & dur, const QString & l, const QString & pers);
-        virtual void supprimerEvt(Evt * e);
+        virtual void supprimerEvt(const QString & s);
         Evt * trouverEvt(const QString & s);
         bool isEvtExistant(const Evt * e) { return trouverEvt(e->getDescripteur()) != NULL; }
         void load(QString & f);
@@ -129,7 +129,7 @@ using namespace std;
             return i;
         }
 
-        class iterator {
+        /*class iterator {
             Evt ** current;
             iterator(Evt ** e): current(e) {}
             friend class EvtManager;
@@ -140,7 +140,7 @@ using namespace std;
             iterator & operator++(){ ++current; return * this; }
         };
         iterator begin() { return iterator(evt); }
-        iterator end() { return iterator(evt+nb); }
+        iterator end() { return iterator(evt+nb); }*/
     };   
 
 
