@@ -1,15 +1,17 @@
 #include "agenda.h"
 
 using namespace std;
-using namespace TIME;
 
-std::ostream& operator <<(std::ostream& f, TIME::Evt1j& j){
+std::ostream & operator <<(std::ostream & f, Evt & j){
         j.afficher(f);
         return f;
 }
+
+/// ******************** Fonctions EvtManager ******************** ///
+
 /// ********** Fonction pour ajouter une tache déjà existante ********** ///
 
-void EvtManager::addEvt(const Evt * e, const QDate & date, const QTime & h) {			/// Je peux mettre que c'est un EvtTache en parametre ?
+void EvtManager::addEvt(const Tache * t, const QDate & date, const QTime & h, bool pre) {
 	//evt -> tableau de tous les evt existants (taches et RDV)
 	//evt[] pointe sur un evenement particulier et evt[][] est l'evenement en lui meme
 	//evt[].getTruc pour les données
@@ -26,37 +28,85 @@ void EvtManager::addEvt(const Evt * e, const QDate & date, const QTime & h) {			
 		evt = newtab;
 		delete[] old;
 	}
-    	
-	for (unsigned int i = 0; i<nb; i++)
-	{
-		if (evt[i].getDate() == e.getDate())
+
+	if (pre == false)
+	{  	
+		for (unsigned int i = 0; i<nb; i++)
 		{
-			unsigned int fin = evt[i].getHoraire() + evt[i].getDuree;		// L'opérateur + doit pas etre defini entre QTime et Duree
-			if((evt[i].getHoraire() < e.getHoraire()) && (e.getHoraire() < fin))
+			if (evt[i].getDate() == date)
 			{
-				cout<<"Erreur, la date et l'horaire démandés sont déjà occupés par un autre evenement !"<<endl;
-				return;
+				unsigned int fin = evt[i].getHoraire() + evt[i].getDuree;		// L'opérateur + doit pas etre defini entre QTime et Duree
+				if((evt[i].getHoraire() < h) && (h < fin))
+				{
+					cout<<"Erreur, la date et l'horaire démandés sont déjà occupés par un autre evenement !"<<endl;
+					return;
+				}
 			}
 		}
-	}
-	if (date < e.getDateDisponibilite())				/// Comment récupérer la dispo de cette tache ?
-	{
-		cout<<"Erreur, la date demandée est antérieure à la date de disponibilité de la tache"<<endl;
-		return;
-	}
-	if (date > e.getDateEcheance())					/// Comment récupérer l'échéance de cette tache ?
-	{
-		cout<<"Erreur, la date demandée est postérieure à la date d'échéance de la tache"<<endl;
-		return;
-	}
+		if (date < t.getDateDisponibilite())
+		{
+			cout<<"Erreur, la date demandée est antérieure à la date de disponibilité de la tache"<<endl;
+			return;
+		}
+		if (date > t.getDateEcheance())
+		{
+			cout<<"Erreur, la date demandée est postérieure à la date d'échéance de la tache"<<endl;
+			return;
+		}
 		
-	//précédence a checker	
+		iterator i = getTachesPrecedentesPourTraitement().getIterator();
+		while(!i.isDone())
+		{
+			if (!isEvtExistant(i.current2()))
+			{
+				cout<<"Erreur de précédence !"<<endl;
+				return;
+			}
+			else
+			{
+				if (date < trouverEvt(i.current2().getID()).getDate)
+				{
+					cout<<"Erreur de précédence !"<<endl;
+					return;
+				}
+			}
+			i.next();
+		}
 
-	evt[nb++]=e;	
+		evt[nb++]=t;
+	}
 }
 
 /// ********** Fonction pour créer puis ajouter une tache ou un RDV ********** ///
 
-virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, const Duree & dur, const QString & l, const QString & pers){
+virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, const Duree & dur, const QString & l, const QString & pers)
+{
+    //Appel constructeur du RDV + le mettre en tache (on ne peux pas creer une tache ici
 
 }
+
+/// ********** Fonction pour trouver l'evenement correspondant a un RDV ou a une tache ********** ///
+
+Evt * EvtManager::trouverEvt(const QSring & s)
+{
+	for(unsigned int i=0; i<nb; i++)
+	{
+		if (evt[i].getSujet() == s)
+		{
+			return evt[i];
+		}
+	}
+	return NULL;
+}
+
+
+
+
+
+
+
+
+
+
+
+

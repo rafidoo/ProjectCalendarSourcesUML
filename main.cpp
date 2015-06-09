@@ -1,6 +1,6 @@
 #include "interface.h"
 #include "gestionprojet.h"
-#include "calendrier.h"
+#include "agenda.h"
 #include "mainwindow.h"
 #include <QCoreApplication>
 

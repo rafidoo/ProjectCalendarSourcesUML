@@ -19,15 +19,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     gestionprojet.cpp \
-    calendrier.cpp \
     interface.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    agenda.cpp
 
 HEADERS += \
     gestionprojet.h \
-    calendrier.h \
     interface.h \
-    mainwindow.h
+    mainwindow.h \
+    agenda.h
 
 FORMS += \
     mainwindow.ui
