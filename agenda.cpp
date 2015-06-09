@@ -85,6 +85,15 @@ virtual Evt & addNewEvt(const QDate & d, const QString & s, const QTime & deb, c
 
 }
 
+/// ********** Fonction pour supprimer un evenement ********** ///
+
+virtual void EvtManager::supprimerEvt(const QString & s)
+{
+    Evt * tmp = & trouverEvt(s);
+    delete tmp;
+    nb--;
+}
+
 /// ********** Fonction pour trouver l'evenement correspondant a un RDV ou a une tache ********** ///
 
 Evt * EvtManager::trouverEvt(const QSring & s)
@@ -98,8 +107,6 @@ Evt * EvtManager::trouverEvt(const QSring & s)
 	}
 	return NULL;
 }
-
-
 
 
 
