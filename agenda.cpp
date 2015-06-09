@@ -7,6 +7,11 @@ std::ostream & operator <<(std::ostream & f, Evt & j){
         return f;
 }
 
+QTime & operator +(const Duree & d)
+{
+    return this.hour() * 60 + this.minute() + d;
+}
+
 /// ******************** Fonctions EvtManager ******************** ///
 
 /// ********** Fonction pour ajouter une tache déjà existante ********** ///
