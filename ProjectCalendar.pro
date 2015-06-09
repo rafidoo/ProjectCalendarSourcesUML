@@ -19,21 +19,27 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     gestionprojet.cpp \
-    calendrier.cpp \
     interface.cpp \
     mainwindow.cpp \
+<<<<<<< HEAD
     fenajoutereve.cpp \
     fenajoutertacheuni.cpp \
     fentachesprecedentes.cpp
+=======
+    agenda.cpp
+>>>>>>> origin/master
 
 HEADERS += \
     gestionprojet.h \
-    calendrier.h \
     interface.h \
     mainwindow.h \
+<<<<<<< HEAD
     fenajoutereve.h \
     fenajoutertacheuni.h \
     fentachesprecedentes.h
+=======
+    agenda.h
+>>>>>>> origin/master
 
 FORMS += \
     mainwindow.ui \
