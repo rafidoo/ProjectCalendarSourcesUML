@@ -1,48 +1,45 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2015-05-03T01:34:53
+# Project created by QtCreator 2015-06-10T19:06:11
 #
 #-------------------------------------------------
 
 QT       += core
+
+QT       -= gui
 QT       += xml
 QT       +=widgets
-
 
 TARGET = ProjectCalendar
 CONFIG   += console
 CONFIG   -= app_bundle
-QMAKE_CXXFLAGS_WARN_ON += -Wno-reorder
 
 TEMPLATE = app
 
 
-SOURCES += main.cpp \
+SOURCES += \
+    agenda.cpp \
+    ../ProjectCalendarasup/fenajoutereve.cpp \
+    fenajoutertacheuni.cpp \
+    fentachesprecedentes.cpp \
     gestionprojet.cpp \
     interface.cpp \
+    main.cpp \
     mainwindow.cpp \
-<<<<<<< HEAD
-    fenajoutereve.cpp \
-    fenajoutertacheuni.cpp \
-    fentachesprecedentes.cpp
-=======
-    agenda.cpp
->>>>>>> origin/master
+    timing.cpp
+
+FORMS += \
+    fenajoutereve.ui \
+    fenajoutertacheuni.ui \
+    fentachesprecedentes.ui \
+    mainwindow.ui
 
 HEADERS += \
+    agenda.h \
+    fenajoutereve.h \
+    fenajoutertacheuni.h \
+    fentachesprecedentes.h \
     gestionprojet.h \
     interface.h \
     mainwindow.h \
-<<<<<<< HEAD
-    fenajoutereve.h \
-    fenajoutertacheuni.h \
-    fentachesprecedentes.h
-=======
-    agenda.h
->>>>>>> origin/master
-
-FORMS += \
-    mainwindow.ui \
-    fenajoutereve.ui \
-    fenajoutertacheuni.ui \
-    fentachesprecedentes.ui
+    timing.h
